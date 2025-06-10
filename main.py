@@ -20,7 +20,7 @@ pay3 = "payslips/document3.pdf"
 #replaced pypdf with pdfminer.six
 
 #-
-with open(pay3,'rb') as f:
+with open(pay,'rb') as f:
     text = extract_text(f)
 
 print(text.split())
@@ -38,6 +38,11 @@ class Worker():
         self.abn = abn
         self.personnel = personnel
         self.position = position
+    def name(txt):
+        lastname = [txt[txt.index(_) + 1] for _ in txt if _ == "Number:"]
+        firstname = [txt[txt.index(_) + 3] for _ in txt if _ == "Number:"]
+
+        return firstname, lastname
     def payment_date(txt):
         date = [txt[txt.index(_) + 1] for _ in txt if _ == "Date:"]
         #returns twice?
@@ -54,11 +59,38 @@ class Worker():
         num = [txt[txt.index(_) + 1] for _ in txt if _ == "2"]
         #returns 4 personnel numbers
         return num
-    def name(txt):
-        lastname = [txt[txt.index(_) + 1] for _ in txt if _ == "Number:"]
-        firstname = [txt[txt.index(_) + 3] for _ in txt if _ == "Number:"]
+    def from_date():
+        pass
+    def to_date():
+        pass
+    def description():
+        pass
+    def pay_scale():
+        pass
+    def hours_min():
+        pass
+    def hourly_rate():
+        pass
+    def amount():
+        pass
+    def tax():
+        pass
+    def year_to_date():
+        pass
+    def period_ending():
+        pass
+    def net_pay():
+        #just amount - tax
+        pass
+    def days_worked(txt):
+        dates = []
+        for x in range(-14, 0):
+            worked = [txt[txt.index(_) + x] for _ in txt if _ == "ROSTERED"]
+            dates.append(worked)
+        wk1 = {"SUN":dates[0], "MON":dates[1], "TUE":dates[2], "WED":dates[3], "THU":dates[4], "FRI":dates[5], "SAT":dates[6]}
+        wk2 = {"SUN":dates[7], "MON":dates[8], "TUE":dates[9], "WED":dates[10], "THU":dates[11], "FRI":dates[12], "SAT":dates[13]}
+        return wk1, wk2
 
-        return firstname, lastname
 
 
 Worker.ABN(text.split())
@@ -85,3 +117,4 @@ print(me.position)
 print(me.firstname)
 print(me.lastname)
 
+print(f"days worked: {Worker.days_worked(text.split())}")
