@@ -21,7 +21,7 @@ pay3 = "payslips/document3.pdf"
 #replaced pypdf with pdfminer.six
 
 #-
-with open(pay,'rb') as f:
+with open(pay2,'rb') as f:
     text = extract_text(f)
 
 print(text.split())
@@ -91,7 +91,10 @@ class Worker():
         return wk1, wk2
     def time_worked(txt):
         #NOTE NEED TO FIX
-        times = [txt[txt.index("SUMMARY") + x] for x in range(1, 13)]
+        #NOTE its in reverse
+        end = len(txt) - txt.index("SUMMARY")
+        times = [txt[len(txt) - x] for x in range(1, end)]
+        times2 = [_.split(":") for _ in times]
         return times
 
 
@@ -103,4 +106,6 @@ print(me.position)
 print(Worker.name(text.split()))
 print(Worker.amount(text.split()))
 print(Worker.net_pay(text.split()))
+print(Worker.days_worked(text.split()))
 print(Worker.time_worked(text.split()))
+# print(text.split()[len(text.split()) - 1])
