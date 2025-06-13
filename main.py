@@ -4,6 +4,8 @@ from pdfminer.layout import LTTextContainer
 import csv
 import pandas
 from datetime import datetime
+from os import listdir
+from os.path import isfile, join
 
 pay = "payslips/document.pdf"
 pay2 = "payslips/document2.pdf"
@@ -21,15 +23,25 @@ pay3 = "payslips/document3.pdf"
 #replaced pypdf with pdfminer.six
 
 #-
-with open(pay2,'rb') as f:
-    text = extract_text(f)
+def gmail_download():
+    """ https://stackoverflow.com/questions/68466624/downloading-password-protected-pdfs-using-gmail-api-in-python 
+    https://developers.google.com/workspace/gmail/api/guides/filtering
+    """
+    pass
+def grab_all_files(folder):
+    files = [f for f in listdir(folder) if isfile(join(folder, f))]
+    return files
 
-print(text.split())
+def open_file(payslip):
+    with open(payslip,'rb') as f:
+        text = extract_text(f)
+    txt = text.split()
+    return txt
 
-
-# print(text.replace('\n', ''))
-
-# print(text.split())
+payslips = grab_all_files("payslips")
+pays =  [open_file(f"payslips/{_}") for _ in payslips]
+print(pays)
+text = pays[0]
 
 #--
 class Worker():
@@ -85,7 +97,8 @@ class Worker():
         num = [txt[txt.index(_) + 1] for _ in txt if _ == "Services"]
         return num
     def days_worked(txt):
-        dates = [txt[txt.index("ROSTERED") - x] for x in range(1, 15)]
+        #dates[0].strftime("%d-%b")
+        dates = [datetime.strptime(txt[txt.index("ROSTERED") - x], "%d-%b") for x in range(1, 15)]
         wk1 = {"SUN":dates[0], "MON":dates[1], "TUE":dates[2], "WED":dates[3], "THU":dates[4], "FRI":dates[5], "SAT":dates[6]}
         wk2 = {"SUN":dates[7], "MON":dates[8], "TUE":dates[9], "WED":dates[10], "THU":dates[11], "FRI":dates[12], "SAT":dates[13]}
         return wk1, wk2
@@ -100,12 +113,20 @@ class Worker():
 
 
 
-me = Worker(firstname=Worker.name(text.split())[0], lastname=Worker.name(text.split())[1], abn=Worker.ABN(text.split()), personnel=Worker.pers_num(text.split()), position="Mail Officer")
+me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
 print(me.position)
 
-print(Worker.name(text.split()))
-print(Worker.amount(text.split()))
-print(Worker.net_pay(text.split()))
-print(Worker.days_worked(text.split()))
-print(Worker.time_worked(text.split()))
-# print(text.split()[len(text.split()) - 1])
+print(Worker.name(text))
+print(Worker.amount(text))
+print(Worker.net_pay(text))
+print(Worker.days_worked(text))
+print(Worker.time_worked(text))
+print(Worker.days_worked(text)[0]["SUN"])
+print(Worker.days_worked(text)[1]["SUN"])
+one = Worker.days_worked(text)[0]["SUN"]
+two = Worker.days_worked(text)[1]["SUN"]
+if one > two:
+    print(f"{one} is greater than {two}")
+else:
+    print(f"{two} is greater than {one}")
+# print(text[len(text) - 1])
