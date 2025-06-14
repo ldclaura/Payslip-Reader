@@ -186,3 +186,7 @@ cython_debug/
 #Payslips
 payslips
 .payslips
+
+#Gmail Reader Thing
+token.json
+credentials.json
