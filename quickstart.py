@@ -32,7 +32,7 @@ def main():
     # Save the credentials for the next run
     with open("token.json", "w") as token:
       token.write(creds.to_json())
-
+#-----------------------------------------------------------------------------------------------------------
   try:
     # Call the Gmail API
     service = build("gmail", "v1", credentials=creds)
@@ -54,7 +54,7 @@ def main():
         if _['name'] == 'From':
           if _['value'] == "": #work from email
             print(_['value'])
-
+#----------------------------------------------------------------------------------------------------------------
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
