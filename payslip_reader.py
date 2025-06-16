@@ -1,10 +1,12 @@
 # importing all the required modules
 from pdfminer.high_level import extract_text, extract_pages
 from pdfminer.layout import LTTextContainer
+import pikepdf
 import csv
 import pandas
 from datetime import datetime
-from os import listdir
+import os
+from os import listdir, getenv
 from os.path import isfile, join
 
 pay = "payslips/document.pdf"
@@ -33,9 +35,19 @@ def grab_all_files(folder):
     return files
 
 def open_file(payslip):
-    with open(payslip,'rb') as f:
-        text = extract_text(f)
-    txt = text.split()
+    try:
+        with open(payslip,'rb') as f:
+            text = extract_text(f)
+            txt = text.split()
+    except:
+        files = [f for f in listdir('.') if isfile(f)]
+        for f in files:
+            print(f)
+            if f.endswith(".pdf"):
+                pdf = pikepdf.open(f,allow_overwriting_input=True, password=os.getenv('PDF_PASSWORD'))
+                pdf.save(f)
+                text = extract_text(f)
+                txt = text.split()
     return txt
 
 payslips = grab_all_files("payslips")
@@ -130,3 +142,4 @@ if one > two:
 else:
     print(f"{two} is greater than {one}")
 # print(text[len(text) - 1])
+print(open_file(""))
