@@ -36,23 +36,35 @@ def grab_all_files(folder):
 
 def open_file(payslip):
     try:
-        with open(payslip,'rb') as f:
+        print(f"📄 Trying to open: {payslip}")
+        with open(payslip, 'rb') as f:
             text = extract_text(f)
-            txt = text.split()
-    except:
-        files = [f for f in listdir('.') if isfile(f)]
-        for f in files:
-            print(f)
-            if f.endswith(".pdf"):
-                pdf = pikepdf.open(f,allow_overwriting_input=True, password=os.getenv('PDF_PASSWORD'))
-                pdf.save(f)
-                text = extract_text(f)
-                txt = text.split()
-    return txt
+            if not text:
+                print(f"⚠️ No text found in {payslip}")
+                return None
+            return text.split()
+    except Exception as e:
+        print(f"🔐 Failed to open {payslip} normally: {e}")
+        try:
+            # Attempt to unlock PDF using password and PikePDF
+            pdf = pikepdf.open(payslip, allow_overwriting_input=True, password=os.getenv('PDF_PASSWORD'))
+            pdf.save(payslip)
+            text = extract_text(payslip)
+            if not text:
+                print(f"⚠️ Still no text after unlocking {payslip}")
+                return None
+            print(f"🔓 Successfully unlocked and read: {payslip}")
+            return text.split()
+        except Exception as unlock_error:
+            print(f"❌ Could not unlock {payslip}: {unlock_error}")
+            return None
 
 payslips = grab_all_files("payslips")
+print(payslips)
+print(os.path.exists("payslips/11161601_20240309_EMAIL.pdf"))
+print(os.getcwd())
 pays =  [open_file(f"payslips/{_}") for _ in payslips]
-print(pays)
+print(f"pays {pays}")
 text = pays[0]
 
 #--
@@ -110,7 +122,10 @@ class Worker():
         return num
     def days_worked(txt):
         #dates[0].strftime("%d-%b")
-        dates = [datetime.strptime(txt[txt.index("ROSTERED") - x], "%d-%b") for x in range(1, 15)]
+        dates = [
+            datetime.strptime(f"{txt[txt.index('ROSTERED') - x]}-2024", "%d-%b-%Y")
+            for x in range(1, 15)
+        ] #assumes year is 2024, to include leap year.
         wk1 = {"SUN":dates[0], "MON":dates[1], "TUE":dates[2], "WED":dates[3], "THU":dates[4], "FRI":dates[5], "SAT":dates[6]}
         wk2 = {"SUN":dates[7], "MON":dates[8], "TUE":dates[9], "WED":dates[10], "THU":dates[11], "FRI":dates[12], "SAT":dates[13]}
         return wk1, wk2
@@ -128,11 +143,17 @@ class Worker():
 me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
 print(me.position)
 
+print("name:")
 print(Worker.name(text))
+print("amount:")
 print(Worker.amount(text))
+print("pay:")
 print(Worker.net_pay(text))
-print(Worker.days_worked(text))
+print("time:")
 print(Worker.time_worked(text))
+print("days worked:")
+print([text[text.index("ROSTERED") - x] for x in range(1, 15)])
+print(Worker.days_worked(text))
 print(Worker.days_worked(text)[0]["SUN"])
 print(Worker.days_worked(text)[1]["SUN"])
 one = Worker.days_worked(text)[0]["SUN"]
@@ -142,4 +163,4 @@ if one > two:
 else:
     print(f"{two} is greater than {one}")
 # print(text[len(text) - 1])
-print(open_file(""))
+

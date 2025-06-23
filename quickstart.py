@@ -25,31 +25,55 @@ def main():
   # The file token.json stores the user's access and refresh tokens, and is
   # created automatically when the authorization flow completes for the first
   # time.
-  if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+  if os.path.exists(os.getenv('TOKEN')):
+    creds = Credentials.from_authorized_user_file(os.getenv('TOKEN'), SCOPES)
   # If there are no (valid) credentials available, let the user log in.
   if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
     else:
       flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
+          os.getenv('TOKEN'), SCOPES
       )
       creds = flow.run_local_server(port=0)
     # Save the credentials for the next run
-    with open("token.json", "w") as token:
+    with open(os.getenv('TOKEN'), "w") as token:
       token.write(creds.to_json())
-  return creds
+  # Connect to Gmail API
+  service = build('gmail', 'v1', credentials=creds)
+  return service
 
-def list_from_subject(credentials):
+def main_copied(serv):
+  """Shows basic usage of the Gmail API.
+  Lists the user's Gmail labels.
+  """
+  service = serv
+
+
+  try:
+
+    results = service.users().labels().list(userId="me").execute()
+    labels = results.get("labels", [])
+
+    if not labels:
+      print("No labels found.")
+      return
+    print("Labels:")
+    for label in labels:
+      print(label["name"])
+
+  except HttpError as error:
+    # TODO(developer) - Handle errors from gmail API.
+    print(f"An error occurred: {error}")
+
+
+def list_from_subject(serv):
   """Shows basic usage of the Gmail API.
   Lists From and Subject.
   """
-  creds = credentials
 
   # Connect to Gmail API
-  service = build('gmail', 'v1', credentials=creds)
-
+  service = serv
   # Get list of message IDs
   results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=10).execute()
   messages = results.get('messages', [])
@@ -66,14 +90,12 @@ def list_from_subject(credentials):
         print("yes")
         
 
-def get_attach(credentials):
+def get_attach(serv):
   """Shows basic usage of the Gmail API.
   Lists the user's Gmail labels.
   """
-  creds = credentials
+  service = serv
   try:
-    # Call the Gmail API
-    service = build("gmail", "v1", credentials=creds)
     # Get list of message IDs
     results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=10).execute()
     messages = results.get('messages', [])
@@ -92,7 +114,8 @@ def get_attach(credentials):
           data = att['data']
           file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
           print(part['filename'])
-          path = ''.join([part['filename']]) #store_dir,
+          filename = part['filename']
+          path = os.path.join("payslips", filename) #store_dir,
           f = open(path, 'wb')
           f.write(file_data)
           f.close()
@@ -105,14 +128,13 @@ def get_attach(credentials):
     # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
 
-def select_payslips_emails(credentials):
+def select_payslips_emails(serv):
   """Shows basic usage of the Gmail API.
   Selects latest 10 emails from payslips.
   """
-  creds = credentials
   try:
     # Call the Gmail API
-    service = build("gmail", "v1", credentials=creds)
+    service = serv
     # Get list of message IDs
     results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=10).execute()
     messages = results.get('messages', [])
@@ -130,6 +152,7 @@ def select_payslips_emails(credentials):
 if __name__ == "__main__":
   tokengen = main()
   tokengen
+  print(main_copied(tokengen))
   list_from_subject(tokengen)
   get_attach(tokengen)
 
@@ -163,3 +186,4 @@ if __name__ == "__main__":
 #             f.close()
 # except errors.HttpError, error:
 #     print 'An error occurred: %s' % error
+
