@@ -75,7 +75,7 @@ def list_from_subject(serv):
   # Connect to Gmail API
   service = serv
   # Get list of message IDs
-  results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=10).execute()
+  results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=1).execute()
   messages = results.get('messages', [])
 
   # Print message subjects and senders
@@ -97,7 +97,7 @@ def get_attach(serv):
   service = serv
   try:
     # Get list of message IDs
-    results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=10).execute()
+    results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=1).execute()
     messages = results.get('messages', [])
 
     # Print message subjects and senders
@@ -136,7 +136,7 @@ def select_payslips_emails(serv):
     # Call the Gmail API
     service = serv
     # Get list of message IDs
-    results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=10).execute()
+    results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=1).execute()
     messages = results.get('messages', [])
 
     # Print message subjects and senders

@@ -65,7 +65,7 @@ print(os.path.exists("payslips/11161601_20240309_EMAIL.pdf"))
 print(os.getcwd())
 pays =  [open_file(f"payslips/{_}") for _ in payslips]
 print(f"pays {pays}")
-text = pays[0]
+text = pays[1]
 
 #--
 class Worker():
@@ -121,11 +121,12 @@ class Worker():
         num = [txt[txt.index(_) + 1] for _ in txt if _ == "Services"]
         return num
     def days_worked(txt):
-        #dates[0].strftime("%d-%b")
+        year = [txt[txt.index(_) + 1] for _ in txt if _ == "Date:"][0][-4:]
         dates = [
-            datetime.strptime(f"{txt[txt.index('ROSTERED') - x]}-2024", "%d-%b-%Y")
+            datetime.strptime(f"{txt[txt.index('ROSTERED') - x]}-{year}", "%d-%b-%Y")
             for x in range(1, 15)
         ] #assumes year is 2024, to include leap year.
+        #changed it to 2025 but need to make it auto detect year
         wk1 = {"SUN":dates[0], "MON":dates[1], "TUE":dates[2], "WED":dates[3], "THU":dates[4], "FRI":dates[5], "SAT":dates[6]}
         wk2 = {"SUN":dates[7], "MON":dates[8], "TUE":dates[9], "WED":dates[10], "THU":dates[11], "FRI":dates[12], "SAT":dates[13]}
         return wk1, wk2
@@ -164,3 +165,22 @@ else:
     print(f"{two} is greater than {one}")
 # print(text[len(text) - 1])
 
+
+payslips = grab_all_files("payslips")
+pays =  [open_file(f"payslips/{_}") for _ in payslips]
+print(f"pays {pays}")
+list_of_pays = []
+list_of_period_ending = []
+for _ in range(0, len(pays)):
+    print(_)
+    text = pays[_]
+    me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
+    list_of_pays.append(Worker.net_pay(text)[0])
+    list_of_period_ending.append(Worker.days_worked(text)[0]["SUN"])
+data_dict = {
+     "pay" : list_of_pays,
+     "period ending": list_of_period_ending
+}
+students_data = pandas.DataFrame(data_dict)
+print(students_data)
+students_data.to_csv("pay.csv")
