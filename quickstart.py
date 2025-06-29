@@ -75,7 +75,7 @@ def list_from_subject(serv):
   # Connect to Gmail API
   service = serv
   # Get list of message IDs
-  results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=1).execute()
+  results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=1).execute() #CHANGED ALL MAXRESULTS TO 1 TO DOWNLOAD LATEST
   messages = results.get('messages', [])
 
   # Print message subjects and senders
@@ -103,30 +103,47 @@ def get_attach(serv):
     # Print message subjects and senders
     for msg in messages:
         msg_id = msg['id']
-        print(msg_id)
     #Get PDF
     message = service.users().messages().get(userId='me', id=msg_id).execute()
     for part in message['payload']['parts']:
       newvar = part['body']
       if 'attachmentId' in newvar:
-          att_id = newvar['attachmentId']
-          att = service.users().messages().attachments().get(userId='me', messageId=msg_id, id=att_id).execute()
-          data = att['data']
-          file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
-          print(part['filename'])
           filename = part['filename']
-          path = os.path.join("payslips", filename) #store_dir,
-          f = open(path, 'wb')
-          f.write(file_data)
-          f.close()
+
+          att_id = newvar['attachmentId']
+
+          return serv, filename, msg_id, att_id
 
 
+          # att = service.users().messages().attachments().get(userId='me', messageId=msg_id, id=att_id).execute()
+          # data = att['data']
+          # file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+
+          # path = os.path.join("payslips", filename) #store_dir,
+          # f = open(path, 'wb')
+          # f.write(file_data)
+          # f.close()
 
 
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
+
+
+def get_pdf(serv, filename, msg_id, att_id):
+    service = serv
+
+
+    att = service.users().messages().attachments().get(userId='me', messageId=msg_id, id=att_id).execute()
+    data = att['data']
+    file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+
+    path = os.path.join("payslips", filename) #store_dir,
+    f = open(path, 'wb')
+    f.write(file_data)
+    f.close()
+
 
 def select_payslips_emails(serv):
   """Shows basic usage of the Gmail API.

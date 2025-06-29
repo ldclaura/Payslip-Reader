@@ -61,7 +61,7 @@ def open_file(payslip):
 
 payslips = grab_all_files("payslips")
 print(payslips)
-print(os.path.exists("payslips/11161601_20240309_EMAIL.pdf"))
+
 print(os.getcwd())
 pays =  [open_file(f"payslips/{_}") for _ in payslips]
 print(f"pays {pays}")
