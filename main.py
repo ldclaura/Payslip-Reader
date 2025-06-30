@@ -1,4 +1,4 @@
-from quickstart import main, get_attach, get_pdf
+from quickstart import main, get_attach, get_pdf, get_msg_id
 from payslip_reader import Worker, grab_all_files, open_file
 import pandas
 import csv
@@ -7,7 +7,13 @@ import csv
 if __name__ == "__main__":
   tokengen = main()
   tokengen
+  print("1")
+  print("1")
+  print("1")
+  print("1")
+  print(f"MSGID {get_msg_id(tokengen)}")
   get_attach(tokengen)
+  print(f"GETATTACH{get_attach(tokengen)}")
   payslips = grab_all_files("payslips")
   download_payslip = True
   for _ in payslips:

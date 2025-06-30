@@ -76,7 +76,7 @@ def list_from_subject(serv):
   # Connect to Gmail API
   service = serv
   # Get list of message IDs
-  results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=1).execute() #CHANGED ALL MAXRESULTS TO 1 TO DOWNLOAD LATEST
+  results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=55).execute() #CHANGED ALL MAXRESULTS TO 1 TO DOWNLOAD LATEST
   messages = results.get('messages', [])
 
   # Print message subjects and senders
@@ -98,12 +98,17 @@ def get_attach(serv):
   service = serv
   try:
     # Get list of message IDs
-    results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=1).execute()
+    results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=55).execute()
     messages = results.get('messages', [])
 
     # Print message subjects and senders
+
     for msg in messages:
         msg_id = msg['id']
+        print("MSG_ID")
+        print(msg_id)
+        print("MESSAGES ID")
+        print(messages)
     #Get PDF
     message = service.users().messages().get(userId='me', id=msg_id).execute()
     for part in message['payload']['parts']:
@@ -116,21 +121,52 @@ def get_attach(serv):
           return serv, filename, msg_id, att_id
 
 
-          # att = service.users().messages().attachments().get(userId='me', messageId=msg_id, id=att_id).execute()
-          # data = att['data']
-          # file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
-
-          # path = os.path.join("payslips", filename) #store_dir,
-          # f = open(path, 'wb')
-          # f.write(file_data)
-          # f.close()
-
 
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
 
+def get_msg_id(serv):
+  """Shows basic usage of the Gmail API.
+  Lists ids in Payslips.
+  """
+  service = serv
+  try:
+    # Get list of message IDs
+    results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=55).execute()
+    messages = results.get('messages', [])
+
+    # List of all msg ids
+    ids = []
+    for msg in messages:
+      ids.append(msg['id'])
+    return ids
+
+
+  except HttpError as error:
+    # TODO(developer) - Handle errors from gmail API.
+    print(f"An error occurred: {error}")
+def get_file_and_attach(serv, msg_id):
+  """Shows basic usage of the Gmail API.
+  Lists the user's Gmail labels.
+  """
+  service = serv
+  try:
+    #Get PDF
+    message = service.users().messages().get(userId='me', id=msg_id).execute()
+    for part in message['payload']['parts']:
+      newvar = part['body']
+      if 'attachmentId' in newvar:
+          filename = part['filename']
+
+          att_id = newvar['attachmentId']
+
+          return filename, att_id
+  
+  except HttpError as error:
+    # TODO(developer) - Handle errors from gmail API.
+    print(f"An error occurred: {error}")
 
 def get_pdf(serv, filename, msg_id, att_id):
     
