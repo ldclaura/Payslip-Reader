@@ -11,6 +11,8 @@ import os
 from dotenv import load_dotenv
 #base64
 import base64
+#MAYBE
+# from flask import Flask, jsonify, render_template, request
 
 
 load_dotenv()
@@ -19,13 +21,14 @@ load_dotenv()
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
 class Payslips:
-    def __init__(self, server, msg_id, attach_id, filename):
-        self.server = server
-        self.msg_id = msg_id
-        self.attach_id = attach_id
-        self.filename = filename
+    def __init__(self):
+        pass
+        # self.server = server
+        # self.msg_id = msg_id
+        # self.attach_id = attach_id
+        # self.filename = filename
 #main, get_attach, get_pdf, get_msg_id
-    def main(): #SELF?
+    def gen_server(self): #SELF?
         """Shows basic usage of the Gmail API.
         Generate the Server
         """
@@ -49,12 +52,70 @@ class Payslips:
                 token.write(creds.to_json())
         # Connect to Gmail API
         service = build('gmail', 'v1', credentials=creds)
+        self.service = service
         return service
-    def get_msg_id(): #SELF?
+
+    def get_msg_id(self): #SELF?
+        """Shows basic usage of the Gmail API.
+        Lists ids in Payslips.
+        """
+        service = self.service
+        try:
+            # Get list of message IDs
+            results = service.users().messages().list(userId='me', labelIds=[os.getenv('PAYSLIPS')], maxResults=55).execute()
+            messages = results.get('messages', [])
+            # List of all msg ids
+            ids = [new_id['id'] for new_id in messages]
+            self.ids = ids
+            return ids
+        except HttpError as error:
+            # TODO(developer) - Handle errors from gmail API.
+            return f"An error occurred: {error}"
+
+    def get_all_payslips_data(self):#SELF?
+        """Scan through gmail Payslips, get data from emails with attachments
+        In the format of {filename:{msg_id:attachment_id}}.
+        saves as self
+        """
+        service = self.service
+        all_payslips_data = {}
+
+        try:
+            for msgid in self.ids:  #for all items in list of ids
+                #check if have PDF
+                message = service.users().messages().get(userId='me', id=msgid).execute()
+                for part in message['payload']['parts']:
+                    newvar = part['body']
+                    if 'attachmentId' in newvar: #if email has attachment
+                        filename = part['filename'] #name of file
+                        att_id = newvar['attachmentId'] #id of attachment (PDF)
+
+                        file_msg_att = {filename: {msgid:att_id}}#{filename:{msg_id:attachment_id}}
+                        all_payslips_data.update(file_msg_att)
+            self.all_payslips_data = all_payslips_data
+        except HttpError as error:
+            # TODO(developer) - Handle errors from gmail API.
+            return f"An error occurred: {error}"
+        
+
+    def get_pdf(self):#SELF?
         pass
-    def get_attach_id():#SELF?
-        pass
-    def get_filename():#SELF?
-        pass
-    def get_pdf():#SELF?
-        pass
+
+
+
+# Payslips.get_msg_id()
+# print(Payslips.msg_id)
+
+p = Payslips()       # Create an instance
+p.gen_server()
+p.get_msg_id()  # Call the method on the instance
+p.get_all_payslips_data()
+#-
+p.get_pdf()
+
+
+print(p.service) # Access the msg_id attribute of that instance
+print("all payslips data filename:msg_id:attachment_id")
+print(p.all_payslips_data)
+
+#NOTE MAYBE JSONIFY IN THE FUTURE FOR API?
