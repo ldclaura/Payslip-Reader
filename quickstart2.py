@@ -13,7 +13,8 @@ from dotenv import load_dotenv
 import base64
 #MAYBE
 # from flask import Flask, jsonify, render_template, request
-
+from os import listdir, getenv
+from os.path import isfile, join
 
 load_dotenv()
 
@@ -98,9 +99,21 @@ class Payslips:
             return f"An error occurred: {error}"
         
 
-    def get_pdf(self):#SELF?
-        pass
+    def get_pdf(self, filename, msg_id, att_id):#SELF?
+        service = self.service
 
+
+        att = service.users().messages().attachments().get(userId='me', messageId=msg_id, id=att_id).execute()
+        data = att['data']
+        file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+
+        path = os.path.join("payslips", filename) #store_dir,
+        f = open(path, 'wb')
+        f.write(file_data)
+        f.close()
+    def check_folder(self):
+        files = [f for f in listdir("payslips") if isfile(join("payslips", f))]
+        return files
 
 
 # Payslips.get_msg_id()
@@ -111,11 +124,34 @@ p.gen_server()
 p.get_msg_id()  # Call the method on the instance
 p.get_all_payslips_data()
 #-
-p.get_pdf()
+# p.get_pdf()
 
 
 print(p.service) # Access the msg_id attribute of that instance
 print("all payslips data filename:msg_id:attachment_id")
-print(p.all_payslips_data)
+print(p.all_payslips_data) #filenames
+
+print("dicks2")
+for _  in p.all_payslips_data["11161601_20230128_EMAIL.pdf"]: #msg_id
+    print(_) #msg_id
+    print(p.all_payslips_data["11161601_20230128_EMAIL.pdf"][_]) #attachment_id
+
+
+
+files = p.check_folder()
+files_i_dont_have = []
+s = set(files)
+for x in p.all_payslips_data:
+    if x not in s:
+        files_i_dont_have.append(x)
+        s.add(x)
+print("files i dont have:")
+print(files_i_dont_have)
+for filename in files_i_dont_have:
+    filename_dict = p.all_payslips_data[filename]
+    for msg_id, att_id in filename_dict.items():
+        p.get_pdf(filename, msg_id, att_id)
+
+
 
 #NOTE MAYBE JSONIFY IN THE FUTURE FOR API?
