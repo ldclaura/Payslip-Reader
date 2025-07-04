@@ -112,8 +112,20 @@ class Payslips:
         f.write(file_data)
         f.close()
     def check_folder(self):
+        """checks Payslips folder and adds files to a list"""
         files = [f for f in listdir("payslips") if isfile(join("payslips", f))]
         return files
+    def check_downloadable_files(self, files):
+        """Compares self payslips data and filenames in folder
+        if files from all_payslips_data are not in folder
+        adds them"""
+        files_i_dont_have = []
+        s = set(files)
+        for x in self.all_payslips_data:
+            if x not in s:
+                files_i_dont_have.append(x)
+                s.add(x)
+        return files_i_dont_have
 
 
 # Payslips.get_msg_id()
@@ -123,10 +135,16 @@ p = Payslips()       # Create an instance
 p.gen_server()
 p.get_msg_id()  # Call the method on the instance
 p.get_all_payslips_data()
-#-
-# p.get_pdf()
+
+files = p.check_folder()
 
 
+for filename in p.check_downloadable_files(files):
+    filename_dict = p.all_payslips_data[filename]
+    for msg_id, att_id in filename_dict.items():
+        p.get_pdf(filename, msg_id, att_id)
+
+#--------------------------------------------------------------------------------
 print(p.service) # Access the msg_id attribute of that instance
 print("all payslips data filename:msg_id:attachment_id")
 print(p.all_payslips_data) #filenames
@@ -135,22 +153,7 @@ print("dicks2")
 for _  in p.all_payslips_data["11161601_20230128_EMAIL.pdf"]: #msg_id
     print(_) #msg_id
     print(p.all_payslips_data["11161601_20230128_EMAIL.pdf"][_]) #attachment_id
-
-
-
-files = p.check_folder()
-files_i_dont_have = []
-s = set(files)
-for x in p.all_payslips_data:
-    if x not in s:
-        files_i_dont_have.append(x)
-        s.add(x)
-print("files i dont have:")
-print(files_i_dont_have)
-for filename in files_i_dont_have:
-    filename_dict = p.all_payslips_data[filename]
-    for msg_id, att_id in filename_dict.items():
-        p.get_pdf(filename, msg_id, att_id)
+#--------------------------------------------------------------------------------
 
 
 

@@ -119,6 +119,9 @@ class Worker():
     def net_pay(txt):
         #just amount - tax
         num = [txt[txt.index(_) + 1] for _ in txt if _ == "Services"]
+        for _ in num:
+            if _ == "TOTAL":
+                num = [txt[txt.index(_) - 1] for _ in txt if _ == "Messages"]
         return num
     def days_worked(txt):
         year = [txt[txt.index(_) + 1] for _ in txt if _ == "Date:"][0][-4:]
@@ -184,3 +187,17 @@ data_dict = {
 students_data = pandas.DataFrame(data_dict)
 print(students_data)
 students_data.to_csv("pay.csv")
+
+
+
+
+# pays = open_file(f"payslips/11161601_20250628_EMAIL.pdf")
+# print(f"pays {pays}")
+# print(Worker.net_pay(pays))
+
+#7/4/2025
+#notes
+#some net pays are too high, comes up with either total pay of year or before tax
+#e.g. 20240615
+#should change it so the fortnightly period ending is just taken from pdf name instead of reading the file
+#because that'll be accurate 100 percent of the time
