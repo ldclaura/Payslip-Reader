@@ -114,8 +114,16 @@ class Worker():
         pass
     def year_to_date():
         pass
-    def period_ending():
-        pass
+    def period_ending(filename):
+        # files = "11161601_20230211_EMAIL.pdf"
+        splitfilename = filename.split("_")#11161601_20230211_EMAIL.pdf
+        # print(files2[1]) #20230211
+        period_end = splitfilename[1]
+        #-
+        n = 2
+        split_period_end = [period_end[i:i+n] for i in range(0, len(period_end), n)]
+        yeardatemonth = split_period_end[0] + split_period_end[1] + "-" + split_period_end[2] + "-" + split_period_end[3]
+        return yeardatemonth
     def net_pay(txt):
         #just amount - tax
         num = [txt[txt.index(_) + 1] for _ in txt if _ == "Services"]
@@ -170,16 +178,18 @@ else:
 
 
 payslips = grab_all_files("payslips")
-pays =  [open_file(f"payslips/{_}") for _ in payslips]
+# pays =  [open_file(f"payslips/{_}") for _ in payslips]
+pays = {_:open_file(f"payslips/{_}") for _ in payslips} #new_dict = {_:open_file(f"payslips/{_}") for _ in payslips}
 print(f"pays {pays}")
 list_of_pays = []
 list_of_period_ending = []
 for _ in range(0, len(pays)):
     print(_)
-    text = pays[_]
+    text = list(pays.values())[_]
     me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
     list_of_pays.append(Worker.net_pay(text)[0])
-    list_of_period_ending.append(Worker.days_worked(text)[0]["SUN"])
+    # list_of_period_ending.append(Worker.days_worked(text)[0]["SUN"]) #!!!
+    list_of_period_ending.append(Worker.period_ending(list(pays.keys())[list(pays.values()).index(text)]))
 data_dict = {
      "pay" : list_of_pays,
      "period ending": list_of_period_ending
