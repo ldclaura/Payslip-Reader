@@ -9,9 +9,6 @@ import os
 from os import listdir, getenv
 from os.path import isfile, join
 
-pay = "payslips/document.pdf"
-pay2 = "payslips/document2.pdf"
-pay3 = "payslips/document3.pdf"
 #to csv
 # data = reader.pages[0].extract_text()
 # pandas.DataFrame(data).to_csv("data.csv")
@@ -59,13 +56,13 @@ def open_file(payslip):
             print(f"❌ Could not unlock {payslip}: {unlock_error}")
             return None
 
-payslips = grab_all_files("payslips")
-print(payslips)
+# payslips = grab_all_files("payslips")
+# print(payslips)
 
-print(os.getcwd())
-pays =  [open_file(f"payslips/{_}") for _ in payslips]
-print(f"pays {pays}")
-text = pays[1]
+# print(os.getcwd())
+# pays =  [open_file(f"payslips/{_}") for _ in payslips]
+# print(f"pays {pays}")
+# text = pays[1]
 
 #--
 class Worker():
@@ -157,51 +154,51 @@ class Worker():
 
 
 
-me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
-print(me.position)
+# me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
+# print(me.position)
 
-print("name:")
-print(Worker.name(text))
-print("amount:")
-print(Worker.amount(text))
-print("pay:")
-print(Worker.net_pay(text))
-print("time:")
-print(Worker.time_worked(text))
-print("days worked:")
-print([text[text.index("ROSTERED") - x] for x in range(1, 15)])
-print(Worker.days_worked(text))
-print(Worker.days_worked(text)[0]["SUN"])
-print(Worker.days_worked(text)[1]["SUN"])
-one = Worker.days_worked(text)[0]["SUN"]
-two = Worker.days_worked(text)[1]["SUN"]
-if one > two:
-    print(f"{one} is greater than {two}")
-else:
-    print(f"{two} is greater than {one}")
-# print(text[len(text) - 1])
+# print("name:")
+# print(Worker.name(text))
+# print("amount:")
+# print(Worker.amount(text))
+# print("pay:")
+# print(Worker.net_pay(text))
+# print("time:")
+# print(Worker.time_worked(text))
+# print("days worked:")
+# print([text[text.index("ROSTERED") - x] for x in range(1, 15)])
+# print(Worker.days_worked(text))
+# print(Worker.days_worked(text)[0]["SUN"])
+# print(Worker.days_worked(text)[1]["SUN"])
+# one = Worker.days_worked(text)[0]["SUN"]
+# two = Worker.days_worked(text)[1]["SUN"]
+# if one > two:
+#     print(f"{one} is greater than {two}")
+# else:
+#     print(f"{two} is greater than {one}")
+# # print(text[len(text) - 1])
 
 
-payslips = grab_all_files("payslips")
-# pays =  [open_file(f"payslips/{_}") for _ in payslips]
-pays = {_:open_file(f"payslips/{_}") for _ in payslips} #new_dict = {_:open_file(f"payslips/{_}") for _ in payslips}
-print(f"pays {pays}")
-list_of_pays = []
-list_of_period_ending = []
-for _ in range(0, len(pays)):
-    print(_)
-    text = list(pays.values())[_]
-    me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
-    list_of_pays.append(Worker.net_pay(text))
-    # list_of_period_ending.append(Worker.days_worked(text)[0]["SUN"]) #!!!
-    list_of_period_ending.append(Worker.period_ending(list(pays.keys())[list(pays.values()).index(text)]))
-data_dict = {
-     "pay" : list_of_pays,
-     "period ending": list_of_period_ending
-}
-students_data = pandas.DataFrame(data_dict)
-print(students_data)
-students_data.to_csv("pay.csv")
+# payslips = grab_all_files("payslips")
+# # pays =  [open_file(f"payslips/{_}") for _ in payslips]
+# pays = {_:open_file(f"payslips/{_}") for _ in payslips} #new_dict = {_:open_file(f"payslips/{_}") for _ in payslips}
+# print(f"pays {pays}")
+# list_of_pays = []
+# list_of_period_ending = []
+# for _ in range(0, len(pays)):
+#     print(_)
+#     text = list(pays.values())[_]
+#     me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
+#     list_of_pays.append(Worker.net_pay(text))
+#     # list_of_period_ending.append(Worker.days_worked(text)[0]["SUN"]) #!!!
+#     list_of_period_ending.append(Worker.period_ending(list(pays.keys())[list(pays.values()).index(text)]))
+# data_dict = {
+#      "pay" : list_of_pays,
+#      "period ending": list_of_period_ending
+# }
+# students_data = pandas.DataFrame(data_dict)
+# print(students_data)
+# students_data.to_csv("pay.csv")
 
 
 

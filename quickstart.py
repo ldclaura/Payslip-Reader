@@ -105,10 +105,10 @@ def get_attach(serv):
 
     for msg in messages:
         msg_id = msg['id']
-        print("MSG_ID")
-        print(msg_id)
-        print("MESSAGES ID")
-        print(messages)
+        # print("MSG_ID")
+        # print(msg_id)
+        # print("MESSAGES ID")
+        # print(messages)
     #Get PDF
     message = service.users().messages().get(userId='me', id=msg_id).execute()
     for part in message['payload']['parts']:
@@ -197,19 +197,13 @@ def select_payslips_emails(serv):
     # Print message subjects and senders
     for msg in messages:
         msg_id = msg['id']
-        print(msg_id)
+        # print(msg_id)
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
 
 
-if __name__ == "__main__":
-  tokengen = main()
-  tokengen
-  print(main_copied(tokengen))
-  list_from_subject(tokengen)
-  get_attach(tokengen)
 
 
 
