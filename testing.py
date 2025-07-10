@@ -26,12 +26,3 @@
 #get filename
 # files = grab_all_files("payslips")
 # print(files)
-files = "11161601_20230211_EMAIL.pdf"
-files2 = files.split("_")#11161601_20230211_EMAIL.pdf
-print(files2[1]) #20230211
-thing = files2[1]
-
-
-n = 2
-splitthing = [thing[i:i+n] for i in range(0, len(thing), n)]
-yeardatemonth = splitthing[0] + splitthing[1] + "-" + splitthing[2] + "-" + splitthing[3]

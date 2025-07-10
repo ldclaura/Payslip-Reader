@@ -130,6 +130,11 @@ class Worker():
         for _ in num:
             if _ == "TOTAL":
                 num = [txt[txt.index(_) - 1] for _ in txt if _ == "Messages"]
+        #if num greater than 4000
+        #num = [txt[txt.index(_) - 2] for _ in txt if _ == "Messages"]
+        num = float(num[0].replace(',', ''))
+        if num > 4000:
+            num = float([txt[txt.index(_) - 2] for _ in txt if _ == "Messages"][0].replace(',', ''))
         return num
     def days_worked(txt):
         year = [txt[txt.index(_) + 1] for _ in txt if _ == "Date:"][0][-4:]
@@ -187,7 +192,7 @@ for _ in range(0, len(pays)):
     print(_)
     text = list(pays.values())[_]
     me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
-    list_of_pays.append(Worker.net_pay(text)[0])
+    list_of_pays.append(Worker.net_pay(text))
     # list_of_period_ending.append(Worker.days_worked(text)[0]["SUN"]) #!!!
     list_of_period_ending.append(Worker.period_ending(list(pays.keys())[list(pays.values()).index(text)]))
 data_dict = {

@@ -40,8 +40,8 @@ for _ in range(0, len(pays)):
     print(_)
     text = pays[_]
     me = Worker(firstname=Worker.name(text)[0], lastname=Worker.name(text)[1], abn=Worker.ABN(text), personnel=Worker.pers_num(text), position="Mail Officer")
-    list_of_pays.append(Worker.net_pay(text)[0])
-    print(Worker.net_pay(text)[0])
+    list_of_pays.append(Worker.net_pay(text))
+    print(Worker.net_pay(text))
     list_of_period_ending.append(Worker.days_worked(text)[0]["SUN"])
     print(Worker.days_worked(text)[0]["SUN"])
 
@@ -55,3 +55,10 @@ students_data = pandas.DataFrame(data_dict)
 students_data.to_csv("pay.csv")
 
 pandas.read_csv("pay.csv")
+print("BAD")
+print(open_file("payslips/11161601_20240127_EMAIL.pdf"))
+print(open_file("payslips/11161601_20230923_EMAIL.pdf"))
+print("GOOD")
+print(open_file("payslips/11161601_20240224_EMAIL.pdf"))
+print(open_file("payslips/11161601_20230729_EMAIL.pdf"))
+
