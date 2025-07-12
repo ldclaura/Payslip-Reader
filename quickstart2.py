@@ -1,5 +1,8 @@
 import os.path
 
+from pdfminer.high_level import extract_text
+import pikepdf
+
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -47,7 +50,7 @@ class Payslips:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     os.getenv('TOKEN'), SCOPES
                 )
-            creds = flow.run_local_server(port=0)
+                creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
             with open(os.getenv('TOKEN'), "w") as token:
                 token.write(creds.to_json())
@@ -126,34 +129,61 @@ class Payslips:
                 files_i_dont_have.append(x)
                 s.add(x)
         return files_i_dont_have
+    def grab_all_files(self, folder):
+        files = [f for f in listdir(folder) if isfile(join(folder, f))]
+        return files
+    def open_file(self, payslip):
+        try:
+            print(f"📄 Trying to open: {payslip}")
+            with open(payslip, 'rb') as f:
+                text = extract_text(f)
+                if not text:
+                    print(f"⚠️ No text found in {payslip}")
+                    return None
+                return text.split()
+        except Exception as e:
+            print(f"🔐 Failed to open {payslip} normally: {e}")
+            try:
+                # Attempt to unlock PDF using password and PikePDF
+                pdf = pikepdf.open(payslip, allow_overwriting_input=True, password=os.getenv('PDF_PASSWORD'))
+                pdf.save(payslip)
+                text = extract_text(payslip)
+                if not text:
+                    print(f"⚠️ Still no text after unlocking {payslip}")
+                    return None
+                print(f"🔓 Successfully unlocked and read: {payslip}")
+                return text.split()
+            except Exception as unlock_error:
+                print(f"❌ Could not unlock {payslip}: {unlock_error}")
+                return None
 
 
 # Payslips.get_msg_id()
 # print(Payslips.msg_id)
 
-p = Payslips()       # Create an instance
-p.gen_server()
-p.get_msg_id()  # Call the method on the instance
-p.get_all_payslips_data()
+# p = Payslips()       # Create an instance
+# p.gen_server()
+# p.get_msg_id()  # Call the method on the instance
+# p.get_all_payslips_data()
 
-files = p.check_folder()
+# files = p.check_folder()
 
 
-for filename in p.check_downloadable_files(files):
-    filename_dict = p.all_payslips_data[filename]
-    for msg_id, att_id in filename_dict.items():
-        p.get_pdf(filename, msg_id, att_id)
+# for filename in p.check_downloadable_files(files):
+#     filename_dict = p.all_payslips_data[filename]
+#     for msg_id, att_id in filename_dict.items():
+#         p.get_pdf(filename, msg_id, att_id)
 
-#--------------------------------------------------------------------------------
-print(p.service) # Access the msg_id attribute of that instance
-print("all payslips data filename:msg_id:attachment_id")
-print(p.all_payslips_data) #filenames
+# #--------------------------------------------------------------------------------
+# print(p.service) # Access the msg_id attribute of that instance
+# print("all payslips data filename:msg_id:attachment_id")
+# print(p.all_payslips_data) #filenames
 
-print("dicks2")
-for _  in p.all_payslips_data["11161601_20230128_EMAIL.pdf"]: #msg_id
-    print(_) #msg_id
-    print(p.all_payslips_data["11161601_20230128_EMAIL.pdf"][_]) #attachment_id
-#--------------------------------------------------------------------------------
+# print("dicks2")
+# for _  in p.all_payslips_data["11161601_20230128_EMAIL.pdf"]: #msg_id
+#     print(_) #msg_id
+#     print(p.all_payslips_data["11161601_20230128_EMAIL.pdf"][_]) #attachment_id
+# #--------------------------------------------------------------------------------
 
 
 
