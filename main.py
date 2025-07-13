@@ -37,11 +37,23 @@ for _  in p.all_payslips_data["11161601_20230128_EMAIL.pdf"]: #msg_id
     print(_) #msg_id
     print(p.all_payslips_data["11161601_20230128_EMAIL.pdf"][_]) #attachment_id
 
-for key, value in p.all_payslips_data.items():
-  print(key)
-print("new_dict = {new_key:new_value for item in list}")
-#CONDITIONAL DICTIONARY COMPREHENSION
-print("new_dict = {new_key:new_value for (key, value) in dict.items() if test}")
+# for key, value in p.all_payslips_data.items():
+#   print(key)
+print("dicks3")
+print(p.all_payslips_data)
+
+objs = [Payslip_Data(open_file(f"payslips/{payslips[i]}")) for i in range(len(p.all_payslips_data))]
+for obj in objs:
+  data_dict = {
+      "pay" : obj.net_pay(),
+      "period ending": obj.period_ending("11161601_20230128_EMAIL.pdf") #maybe put filename in obj self.
+  }
+
+
+  print(data_dict)
+# print("new_dict = {new_key:new_value for item in list}")
+# #CONDITIONAL DICTIONARY COMPREHENSION
+# print("new_dict = {new_key:new_value for (key, value) in dict.items() if test}")
 #-------------------------------------------------------------------------------------
 
 # data_dict = {

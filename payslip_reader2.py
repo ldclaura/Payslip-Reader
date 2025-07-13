@@ -22,9 +22,11 @@ from os.path import isfile, join
 #replaced pypdf with pdfminer.six
 
 class Payslip_Data:
-    def __init__(self):
-        pass
-    def net_pay(self, txt):
+    def __init__(self, txt):
+        self.txt = txt
+        #filename??
+    def net_pay(self):
+        txt = self.txt
         #just amount - tax
         num = [txt[txt.index(_) + 1] for _ in txt if _ == "Services"]
         for _ in num:
