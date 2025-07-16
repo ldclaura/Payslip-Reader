@@ -79,7 +79,7 @@ class Payslips:
     def get_all_payslips_data(self):#SELF?
         """Scan through gmail Payslips, get data from emails with attachments
         In the format of {filename:{msg_id:attachment_id}}.
-        saves as self
+        saves as self.all_payslips_data
         """
         service = self.service
         all_payslips_data = {}
@@ -133,6 +133,9 @@ class Payslips:
         files = [f for f in listdir(folder) if isfile(join(folder, f))]
         return files
     def open_file(self, payslip):
+        """takes payslip string
+        unlocks pdf if needed  using PDF_PASSWORD in .env
+        opens and extracts text"""
         try:
             print(f"📄 Trying to open: {payslip}")
             with open(payslip, 'rb') as f:

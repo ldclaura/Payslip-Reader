@@ -22,10 +22,12 @@ from os.path import isfile, join
 #replaced pypdf with pdfminer.six
 
 class Payslip_Data:
-    def __init__(self, txt):
+    def __init__(self, txt, filename):
         self.txt = txt
-        #filename??
+        self.filename = filename
     def net_pay(self):
+        """finds net pay
+        saves as self.pay"""
         txt = self.txt
         #just amount - tax
         num = [txt[txt.index(_) + 1] for _ in txt if _ == "Services"]
@@ -39,9 +41,11 @@ class Payslip_Data:
             num = float([txt[txt.index(_) - 2] for _ in txt if _ == "Messages"][0].replace(',', ''))
         self.pay = num            
         return num
-    def period_ending(self, filename):
+    def period_ending(self):
+        """finds period ending of pdf from pdf name
+        saves as self.period_end"""
         # files = "11161601_20230211_EMAIL.pdf"
-        splitfilename = filename.split("_")#11161601_20230211_EMAIL.pdf
+        splitfilename = self.filename.split("_")#11161601_20230211_EMAIL.pdf
         # print(files2[1]) #20230211
         period_end = splitfilename[1]
         #-
